@@ -82,7 +82,7 @@ async def lobby_handler(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
         keys = await get_recomendations(1, conn)
-        await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode )
+        await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML )
     
 
 if __name__ == '__main__':

@@ -23,7 +23,9 @@ async def db_create_user(user_id, conn: sqlite3.Connection):
 # Создание профиля
 async def db_create_profile(user_id, conn, **kwargs):
     try:
-        conn.cursor().execute()
+        return
+        conn.cursor().execute("INSERT INTO profiles (telegram_id, profile_name, salary, skills, education, expirience, jobtime, jobtype, city) VALUES (?,?,?,?,?,?,?,?,?)",(user_id, kwargs['profile_name'],))
+        conn.commit()
     except:
         return False     
     
