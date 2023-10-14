@@ -1,0 +1,37 @@
+from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+
+main_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+main_keyboard.add(KeyboardButton('Создать новый профиль'))
+main_keyboard.add(KeyboardButton('Изменить текущий профиль'))
+main_keyboard.add(KeyboardButton('Сменить профиль'))
+main_keyboard.add(KeyboardButton('Посмотреть вакансии по текущему профилю'))
+main_keyboard.add(KeyboardButton('Получить рекомендации по текущему профилю'))
+
+employment_keyboard = InlineKeyboardMarkup()
+employment_keyboard.add(InlineKeyboardButton('Полная'))
+employment_keyboard.add(InlineKeyboardButton('Частичная'))
+employment_keyboard.add(InlineKeyboardButton('Проектная'))
+employment_keyboard.add(InlineKeyboardButton('Стажировка'))
+employment_keyboard.add(InlineKeyboardButton('Подработка'))
+employment_keyboard.add(InlineKeyboardButton('Неполный день'))
+employment_keyboard.add(InlineKeyboardButton('По выходным'))
+employment_keyboard.add(InlineKeyboardButton('По вечерам'))
+employment_keyboard.add(InlineKeyboardButton('Волонтерство'))
+
+schedule_keyboard = InlineKeyboardMarkup()
+schedule_keyboard.add(InlineKeyboardButton('Полный'))
+schedule_keyboard.add(InlineKeyboardButton('Сменный'))
+schedule_keyboard.add(InlineKeyboardButton('Гибкий'))
+schedule_keyboard.add(InlineKeyboardButton('Удаленная'))
+schedule_keyboard.add(InlineKeyboardButton('Вахта'))
+
+education_keyboard = InlineKeyboardMarkup()
+education_keyboard.add(InlineKeyboardButton('Нет образования'))
+education_keyboard.add(InlineKeyboardButton('Среднее профессиональное'))
+education_keyboard.add(InlineKeyboardButton('Высшее'))
+
+experience_keyboard = InlineKeyboardMarkup()
+experience_keyboard.add(InlineKeyboardButton('Нет опыта'))
+experience_keyboard.add(InlineKeyboardButton('1-3 лет'))
+experience_keyboard.add(InlineKeyboardButton('3-6 лет'))
+experience_keyboard.add(InlineKeyboardButton('6 лет и более'))
