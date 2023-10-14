@@ -1,16 +1,9 @@
 import asyncio
 import sqlite3
 
-async def check_transaction(hash, conn: sqlite3.Connection):
-    if conn.cursor().execute("SELECT hash FROM transactions WHERE hash = ?", (hash,)).fetchone() != None:
-        return True
+async def get_profile(profile_id, conn: sqlite3.Connection):
+    profile_row = conn.cursor().execute("SELECT * FROM profiles WHERE profile_id = ?", (profile_id,)).fetchone()
+    if profile_row != None:
+        return profile_row
     else:
-        return False
-
-async def add_v_transaction(source, hash, value, comment, conn: sqlite3.Connection):
-    try:
-        conn.cursor().execute("INSERT INTO transactions (source, hash, value, comment) VALUES (?, ?, ?, ?)",(source, hash, value, comment))
-        conn.commit()
-        return True
-    except:
         return False
