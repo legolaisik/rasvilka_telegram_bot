@@ -7,8 +7,8 @@ main_keyboard.add(KeyboardButton('Сменить профиль'))
 main_keyboard.add(KeyboardButton('Посмотреть вакансии по текущему профилю'))
 main_keyboard.add(KeyboardButton('Получить рекомендации по текущему профилю'))
 
-next_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-main_keyboard.add(KeyboardButton('Дальше'))
+next_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+next_keyboard.add(KeyboardButton('Дальше'))
 
 employment_keyboard = InlineKeyboardMarkup()
 employment_keyboard.add(InlineKeyboardButton('Полная'))

@@ -71,8 +71,8 @@ async def enter_profile_name_handler(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['enter_profile_name'] = message.text
 
-    await bot.send_message(message.from_user.id, "Отлично! Должность %s введена" % message.text)
-    await bot.send_message(message.from_user.id, "Введите желаемую зарплату. Если она не важна, нажмите дальше" % message.text, reply_markup = next_keyboard)
+    await bot.send_message(message.from_user.id, "Отлично\! Должность %s введена" % message.text)
+    await bot.send_message(message.from_user.id, "Введите желаемую зарплату\. Если она не важна, нажмите дальше", reply_markup = next_keyboard)
 
     await register.enter_salary.set()
 
@@ -84,7 +84,7 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['enter_salary'] = ''
 
-        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
+        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
         await register.enter_skills.set()
 
     else:
@@ -94,9 +94,9 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
             async with state.proxy() as data:
                 data['enter_salary'] = str(salary)
 
-            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
+            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
             await register.enter_skills.set()
-            
+
         except:
             await bot.send_message(message.from_user.id, "Введите число или нажмите Дальше", reply_markup = next_keyboard)
         
