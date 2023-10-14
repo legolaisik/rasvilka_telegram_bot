@@ -11,8 +11,6 @@ from config import *
 
 BASE_URL = "https://api.hh.ru/vacancies"
 headers = {'HH-User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"}
-conn = sqlite3.connect("bot.db")
-cursor = conn.cursor()
 
 async def get_recomendations(profile_id, conn: sqlite3.Connection):
 
@@ -108,5 +106,3 @@ async def get_vacancies(profile_id, conn: sqlite3.Connection):
     else:
 
         return False
-
-print(asyncio.run(get_vacancies(1, conn)))
