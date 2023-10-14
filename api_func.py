@@ -3,7 +3,6 @@ import json
 import sqlite3
 
 from sql_func import *
-from ton_func import *
 from config import *
 
 MAINNET_API_BASE = "https://toncenter.com/api/v2/"
