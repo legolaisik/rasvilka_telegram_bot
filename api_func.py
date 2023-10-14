@@ -15,7 +15,7 @@ headers = {'HH-User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/2010
 
 async def get_recomendations(profile_id, conn: sqlite3.Connection):
 
-    profile = await get_profile(profile_id, conn)
+    profile = await db_get_profile(profile_id, conn)
     if profile:
 
         params = {
@@ -69,7 +69,7 @@ async def get_recomendations(profile_id, conn: sqlite3.Connection):
     
 async def get_vacancies(profile_id, conn: sqlite3.Connection):
 
-    profile = await get_profile(profile_id, conn)
+    profile = await db_get_profile(profile_id, conn)
     if profile:
 
         params = {
