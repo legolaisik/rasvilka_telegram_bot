@@ -2,22 +2,20 @@ import asyncio
 import sqlite3
 
 # Проверка наличия юзера
-async def db_check_user(user_id, conn):
+async def db_check_user(user_id, conn: sqlite3.Connection):
     try:
-        conn.cursor().execute("SELECT telegram_id FROM users where telegram_id = ?",(user_id))
-        result = conn.cursor().fetchone()
-        if result == False:
-            return False
-        else:
+        if conn.cursor().execute("SELECT * FROM users where telegram_id = ?", (user_id,)).fetchone() != None:
             return True
+        else:
+            return False
     except:
         return False
             
 
 # Создание юзера
-async def db_create_user(user_id, conn):
+async def db_create_user(user_id, conn: sqlite3.Connection):
     try:
-        conn.cursor().execute("INSERT INTO users (telegram_id) VALUES (?)", (user_id))
+        conn.cursor().execute("INSERT INTO users (telegram_id) VALUES (?)", (str(user_id), ))
         conn.commit()
         return True
     except:

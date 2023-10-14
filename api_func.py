@@ -5,6 +5,7 @@ import sqlite3
 import time
 from fuzzywuzzy import process
 import random
+import re
 
 from sql_func import *
 from config import *
@@ -92,16 +93,19 @@ async def get_vacancies(profile_id, conn: sqlite3.Connection):
 
         role = item['name']
         company = item['employer']['name']
-        salary = str(item['salary']['to'])
+        try:
+            salary = str(item['salary']['to'])
+        except:
+            salary = '?'
         descr = item['snippet']['responsibility']
         link = item['alternate_url']
 
         answer = '''Должность %s от компании %s
 Зарплата до %s
-Описание: %s
+Описание: %s 
 Посмотреть подробнее: %s''' % (role, company, salary, descr, link)
         
-        return answer
+        return re.sub('<.*?>', '', answer)
     
     else:
 

@@ -16,7 +16,7 @@ cursor = conn.cursor()
 from config import *
 from sql_func import *
 from api_func import *
-import keyboard
+from keyboard import *
 
 logging.basicConfig(level=logging.INFO)
 
@@ -58,7 +58,7 @@ async def start(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, "Введите желаемую вакансию")
         await register.enter_profile_name.set()
     else:
-        await bot.send_message(message.from_user.id, "here")
+        await bot.send_message(message.from_user.id, "Привет\! Выберите действие", reply_markup=main_keyboard)
         await lobby.profiles_list.set()
 
 @dp.message_handler(state=register.new_profile)
@@ -75,7 +75,15 @@ async def create_new_profile(message: types.Message, state: FSMContext):
     await bot.send_message(message.from_user.id, "Вы ввели %s"%profile_name)
     await register.enter_profile_name.set()
     
-
+@dp.message_handler(state=lobby.profiles_list)
+async def lobby_handler(message: types.Message, state: FSMContext):
+    if message.text == 'Посмотреть вакансии по текущему профилю':
+        answer = await get_vacancies(1, conn)
+        await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
+    elif message.text == 'Получить рекомендации по текущему профилю':
+        keys = await get_recomendations(1, conn)
+        await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode )
+    
 
 if __name__ == '__main__':
 
