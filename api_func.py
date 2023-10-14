@@ -13,10 +13,127 @@ from config import *
 BASE_URL = "https://api.hh.ru/vacancies"
 headers = {'HH-User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"}
 
-async def get_recomendations(profile_id, conn: sqlite3.Connection):
+employment_list = [
+    {
+        "id": "full",
+        "name": "Полная занятость"
+    },
+    {
+        "id": "part",
+        "name": "Частичная занятость"
+    },
+    {
+        "id": "project",
+        "name": "Проектная работа"
+    },
+    {
+        "id": "volunteer",
+        "name": "Волонтерство"
+    },
+    {
+        "id": "probation",
+        "name": "Стажировка"
+    }
+]
+    
+schedule_list = [
+    {
+        "id": "fullDay",
+        "name": "Полный день"
+    },
+    {
+        "id": "shift",
+        "name": "Сменный график"
+    },
+    {
+        "id": "flexible",
+        "name": "Гибкий график"
+    },
+    {
+        "id": "remote",
+        "name": "Удаленная работа"
+    },
+    {
+        "id": "flyInFlyOut",
+        "name": "Вахтовый метод"
+    }
+]
 
-    profile = await db_get_profile(profile_id, conn)
+education_level_list = [
+    {
+        "id": "secondary",
+        "name": "Среднее"
+    },
+    {
+        "id": "special_secondary",
+        "name": "Среднее специальное"
+    },
+    {
+        "id": "unfinished_higher",
+        "name": "Неоконченное высшее"
+    },
+    {
+        "id": "higher",
+        "name": "Высшее"
+    },
+    {
+        "id": "bachelor",
+        "name": "Бакалавр"
+    },
+    {
+        "id": "master",
+        "name": "Магистр"
+    },
+    {
+        "id": "candidate",
+        "name": "Кандидат наук"
+    },
+    {
+        "id": "doctor",
+        "name": "Доктор наук"
+    }
+]
+
+expirience_list = [
+    {
+        "id": "noExperience",
+        "name": "Нет опыта"
+    },
+    {
+        "id": "between1And3",
+        "name": "От 1 года до 3 лет"
+    },
+    {
+        "id": "between3And6",
+        "name": "От 3 до 6 лет"
+    },
+    {
+        "id": "moreThan6",
+        "name": "Более 6 лет"
+    }
+]
+
+
+async def get_recomendations(user_id, conn: sqlite3.Connection):
+
+    profile = await db_get_profile(user_id, conn)
     if profile:
+
+        for i in expirience_list:
+            if i['name'] == profile[6]:
+                expirience = i['id']
+
+        for i in employment_list:
+            if i['name'] == profile[8]:
+                employment = i['id']
+
+        for i in schedule_list:
+            if i['name'] == profile[7]:
+                schedule = i['id']
+
+        for i in education_level_list:
+            if i['name'] == profile[5]:
+                education_level = i['id']
 
         params = {
             'text': profile[2]
@@ -24,11 +141,11 @@ async def get_recomendations(profile_id, conn: sqlite3.Connection):
         if profile[9] != '':
             params['area'] = profile[9]
         if profile[6] != '':
-            params['experience'] = profile[6]
+            params['experience'] = expirience
         if profile[7] != '':
-            params['employment'] = profile[7]
+            params['employment'] = employment
         if profile[8] != '':
-            params['schedule'] = profile[8]
+            params['schedule'] = schedule
         if profile[3] != '':
             params['salary'] = profile[3]
 
@@ -43,8 +160,6 @@ async def get_recomendations(profile_id, conn: sqlite3.Connection):
                     key_list[skill['name'].lower()] += 1
                 else:
                     key_list[skill['name'].lower()] = 1
-
-            time.sleep(2)
 
         keys = []
         for key, value in key_list.items():
@@ -67,10 +182,26 @@ async def get_recomendations(profile_id, conn: sqlite3.Connection):
 
         return False
     
-async def get_vacancies(profile_id, conn: sqlite3.Connection):
+async def get_vacancies(user_id, conn: sqlite3.Connection):
 
-    profile = await db_get_profile(profile_id, conn)
+    profile = await db_get_profile(user_id, conn)
     if profile:
+
+        for i in expirience_list:
+            if i['name'] == profile[6]:
+                expirience = i['id']
+
+        for i in employment_list:
+            if i['name'] == profile[8]:
+                employment = i['id']
+
+        for i in schedule_list:
+            if i['name'] == profile[7]:
+                schedule = i['id']
+
+        for i in education_level_list:
+            if i['name'] == profile[5]:
+                education_level = i['id']
 
         params = {
             'text': profile[2]
@@ -78,17 +209,16 @@ async def get_vacancies(profile_id, conn: sqlite3.Connection):
         if profile[9] != '':
             params['area'] = profile[9]
         if profile[6] != '':
-            params['experience'] = profile[6]
+            params['experience'] = expirience
         if profile[7] != '':
-            params['employment'] = profile[7]
+            params['employment'] = employment
         if profile[8] != '':
-            params['schedule'] = profile[8]
+            params['schedule'] = schedule
         if profile[3] != '':
             params['salary'] = profile[3]
 
         key_list = {}
         r = requests.get(BASE_URL, headers=headers, params=params)
-
         item = random.choice(r.json()['items'])
 
         role = item['name']

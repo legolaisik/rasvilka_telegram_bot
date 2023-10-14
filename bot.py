@@ -38,6 +38,7 @@ class register(StatesGroup):
 class lobby(StatesGroup):
     hello = State()
     profiles_list = State()
+    choose_from_profile = State()
     
 class profile(StatesGroup):
     get_vacancies = State()
@@ -51,17 +52,21 @@ async def set_default_commands(dp):
     ])
     
     
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start'], state='*')
 async def start_handler(message: types.Message, state: FSMContext):
     if not await db_check_user(message.from_user.id, conn):
+
         await db_create_user(message.from_user.id, conn)
+        await bot.send_message(message.from_user.id, """Привет\!
+Это бот Развилка, который поможет тебе освоить траекторию твоей карьеры\:\)
+Вводи данные ниже и освой навыки, которые понадобятся для работы мечты\!""")
 
         #Начинаем создавать профиль
-        await bot.send_message(message.from_user.id, "Введите желаемую вакансию вида \'Junior Python Разработчик\'")
+        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например: Технический директор")
         await register.enter_profile_name.set()
 
     else:
-        await bot.send_message(message.from_user.id, "Привет\! Выберите действие", reply_markup=main_keyboard)
+        await bot.send_message(message.from_user.id, "Привет\! Выберите действие", reply_markup=get_main_keyboard())
         await lobby.profiles_list.set()
 
 
@@ -72,7 +77,7 @@ async def enter_profile_name_handler(message: types.Message, state: FSMContext):
         data['enter_profile_name'] = message.text
 
     await bot.send_message(message.from_user.id, "Отлично\! Должность %s введена" % message.text)
-    await bot.send_message(message.from_user.id, "Введите желаемую зарплату\. Если она не важна, нажмите дальше", reply_markup = next_keyboard)
+    await bot.send_message(message.from_user.id, "Введите желаемую зарплату\. Если она не важна, нажмите дальше", reply_markup = get_next_keyboard())
 
     await register.enter_salary.set()
 
@@ -84,7 +89,7 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['enter_salary'] = ''
 
-        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
+        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
         await register.enter_skills.set()
 
     else:
@@ -94,27 +99,155 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
             async with state.proxy() as data:
                 data['enter_salary'] = str(salary)
 
-            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = next_keyboard)
+            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
             await register.enter_skills.set()
 
         except:
-            await bot.send_message(message.from_user.id, "Введите число или нажмите Дальше", reply_markup = next_keyboard)
+            await bot.send_message(message.from_user.id, "Введите число или нажмите Дальше", reply_markup = get_next_keyboard())
+
+
+@dp.message_handler(state=register.enter_skills)
+async def enter_skills_handler(message: types.Message, state: FSMContext):
+
+    if message.text == 'Дальше':
+
+        async with state.proxy() as data:
+
+            if 'enter_skills' not in data:
+
+                await bot.send_message(message.from_user.id, "Вы еще не ввели ни одного навыка\:\( Уверены, что в Вас что\-то есть\)", reply_markup = get_next_keyboard())
+           
+            else:
+
+                await bot.send_message(message.from_user.id, "Отлично\! Выберите Ваше образование", reply_markup = get_education_keyboard())
+                await register.enter_education.set()
+
+    else:
+
+        async with state.proxy() as data:
+
+            if 'enter_skills' not in data:
+                data['enter_skills'] = message.text
+            else:
+                data['enter_skills'] += ', %s' % message.text
+
+        await bot.send_message(message.from_user.id, "Записали %s, Еще?" % message.text, reply_markup = get_next_keyboard(), parse_mode=ParseMode.HTML)
+
+
+@dp.message_handler(state=register.enter_education)
+async def enter_education_handler(message: types.Message, state: FSMContext):
+
+    if message.text in ['Нет образования', 'Среднее профессиональное', 'Высшее']:
+
+        async with state.proxy() as data:
+
+            data['enter_education'] = message.text
+        
+        await bot.send_message(message.from_user.id, "Отлично\! Укажите Ваш опыт", reply_markup = get_experience_keyboard())
+        await register.enter_experience.set()
+
+    else:
+
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = get_education_keyboard())
+
+
+@dp.message_handler(state=register.enter_experience)
+async def enter_experience_handler(message: types.Message, state: FSMContext):
+
+    if message.text in ['Нет опыта', 'От 1 года до 3 лет', 'От 3 до 6 лет', 'Более 6 лет']:
+
+        async with state.proxy() as data:
+
+            data['enter_experience'] = message.text
+        
+        await bot.send_message(message.from_user.id, "Отлично\! Какой график хотите?", reply_markup = get_schedule_keyboard())
+        await register.enter_jobtime.set()
+
+    else:
+
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = get_experience_keyboard())
+
+
+@dp.message_handler(state=register.enter_jobtime)
+async def enter_jobtime_handler(message: types.Message, state: FSMContext):
+
+    if message.text in ['Полный день', 'Сменный график', 'Гибкий график', 'Удаленная работа', 'Вахтовый метод']:
+
+        async with state.proxy() as data:
+
+            data['enter_jobtime'] = message.text
+        
+        await bot.send_message(message.from_user.id, "Отлично\! Как хотите работать?", reply_markup = get_employment_keyboard())
+        await register.enter_jobtype.set()
+
+    else:
+
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = get_schedule_keyboard())
+
+
+@dp.message_handler(state=register.enter_jobtype)
+async def enter_jobtype_handler(message: types.Message, state: FSMContext):
+
+    if message.text in ['Полная занятость', 'Частичная занятость', 'Проектная работа', 'Волонтерство', 'Стажировка']:
+
+        async with state.proxy() as data:
+
+            data['enter_jobtype'] = message.text
+            await db_create_profile(message.from_user.id, conn, data)
+
+        await bot.send_message(message.from_user.id, "Отлично\! Профиль зарегистрирован", reply_markup = get_main_keyboard())
+        await lobby.profiles_list.set()
+
+    else:
+
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = get_employment_keyboard())
+
+
+@dp.message_handler(state=lobby.choose_from_profile)
+async def choose_from_profile_handler(message: types.Message, state: FSMContext):
+
+    if message.text in await db_get_profiles(message.from_user.id, conn):
+
+        await db_set_primary_profile(message.from_user.id, conn, message.text)
+        await bot.send_message(message.from_user.id, "Отлично\! Профиль поменяли\)", reply_markup = get_main_keyboard())
+        await lobby.profiles_list.set()
+
+    else:
+
+        profiles = await db_get_profiles(message.from_user.id, conn)
+        profiles_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+        for profile in profiles:
+            profiles_keyboard.add(KeyboardButton(profile))
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = profiles_keyboard())
         
 
 @dp.message_handler(state=lobby.profiles_list)
 async def lobby_handler(message: types.Message, state: FSMContext):
     if message.text == 'Посмотреть вакансии по текущему профилю':
-        answer = await get_vacancies(1, conn)
+        answer = await get_vacancies(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
-        keys = await get_recomendations(1, conn)
+        keys = await get_recomendations(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML)
     elif message.text == 'Создать новый профиль':
 
         #Начинаем создавать профиль
-        await bot.send_message(message.from_user.id, "Введите желаемую вакансию вида \'Junior Python Разработчик\'")
+        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например: Технический директор")
         await register.enter_profile_name.set()
-    
+    elif message.text == 'Сменить профиль':
+        profiles = await db_get_profiles(message.from_user.id, conn)
+        profiles_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+        for profile in profiles:
+            profiles_keyboard.add(KeyboardButton(profile))
+        await bot.send_message(message.from_user.id, "Выберите профиль:", reply_markup=profiles_keyboard)
+        await lobby.choose_from_profile.set()
+    elif message.text == 'Удалить текущий профиль':
+        if len(await db_get_profiles(message.from_user.id, conn)) > 1:
+            await db_delete_current_profile(message.from_user.id, conn)
+            await bot.send_message(message.from_user.id, "Профиль удален\!", reply_markup=get_main_keyboard())
+        else:
+            await bot.send_message(message.from_user.id, "У Вас всего один профиль\( Сначала добавьте новый", reply_markup=get_main_keyboard())
+
 
 if __name__ == '__main__':
 
