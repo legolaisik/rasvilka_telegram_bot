@@ -1,16 +1,41 @@
 import asyncio
 import sqlite3
 
-async def check_transaction(hash, conn: sqlite3.Connection):
-    if conn.cursor().execute("SELECT hash FROM transactions WHERE hash = ?", (hash,)).fetchone() != None:
-        return True
-    else:
-        return False
-
-async def add_v_transaction(source, hash, value, comment, conn: sqlite3.Connection):
+# Проверка наличия юзера
+async def db_check_user(user_id, conn):
     try:
-        conn.cursor().execute("INSERT INTO transactions (source, hash, value, comment) VALUES (?, ?, ?, ?)",(source, hash, value, comment))
+        conn.cursor().execute("SELECT telegram_id FROM users where telegram_id = ?",(user_id))
+        result = conn.cursor().fetchone()
+        if result == False:
+            return False
+        else:
+            return True
+    except:
+        return False
+            
+
+# Создание юзера
+async def db_create_user(user_id, conn):
+    try:
+        conn.cursor().execute("INSERT INTO users (telegram_id) VALUES (?)", (user_id))
         conn.commit()
         return True
     except:
         return False
+        
+# Создание профиля
+async def db_create_profile(user_id, conn, **kwargs):
+    try:
+        conn.cursor().execute()
+    except:
+        return False 
+    
+# Получение профилей для юзера
+async def db_get_user_profiles(user_id, conn: sqlite3.Connection):
+    try:
+        conn.cursor().execute("SELECT profile_name FROM profiles WHERE telegram_id = ?", (user_id))
+        return conn.cursor().fetchone()
+    except:
+        return False
+    
+    
