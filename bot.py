@@ -62,7 +62,7 @@ async def start_handler(message: types.Message, state: FSMContext):
 Вводи данные ниже и освой навыки, которые понадобятся для работы мечты\!""")
 
         #Начинаем создавать профиль
-        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например: Технический директор\. Пожалуйста, не используйте символы, только пробелы\.")
+        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например: Технический директор\.")
         await register.enter_profile_name.set()
 
     else:
@@ -76,7 +76,7 @@ async def enter_profile_name_handler(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['enter_profile_name'] = message.text
 
-    await bot.send_message(message.from_user.id, "Отлично\! Должность %s введена" % message.text)
+    await bot.send_message(message.from_user.id, "Отлично! Должность %s введена" % message.text, parse_mode=ParseMode.HTML)
     await bot.send_message(message.from_user.id, "Введите желаемую зарплату \(например, 50000\)\. Если она не важна, нажмите дальше", reply_markup = get_next_keyboard())
 
     await register.enter_salary.set()
@@ -232,7 +232,7 @@ async def lobby_handler(message: types.Message, state: FSMContext):
     elif message.text == 'Создать новый профиль':
 
         #Начинаем создавать профиль
-        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например\: Технический директор\. Пожалуйста, не используйте символы, только пробелы\.")
+        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например\: Технический директор\.")
         await register.enter_profile_name.set()
     elif message.text == 'Сменить профиль':
         profiles = await db_get_profiles(message.from_user.id, conn)
