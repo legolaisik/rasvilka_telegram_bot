@@ -256,9 +256,24 @@ async def lobby_handler(message: types.Message, state: FSMContext):
         answer = await get_vacancies(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
-        keys, answer = await get_recomendations(message.from_user.id, conn)
-        await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML)
-        await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
+
+        await bot.send_message(message.from_user.id, 'Я уже начал собирать информацию\.\.\.', parse_mode=ParseMode.HTML)
+        await bot.send_chat_action(message.from_user.id, 'typing')
+        
+        keys,vacancy1, answer, vacancy2 = await get_recomendations(message.from_user.id, conn)
+        
+        message1 = """Основываясь на Ваших навыках, сейчас Вы можете посмотреть такую вакансию:
+%s""" % vacancy1
+        await bot.send_message(message.from_user.id, message1, parse_mode=ParseMode.HTML)
+
+        message2 = """Вот наши советы как достичь работы мечты:
+%s""" % answer
+        await bot.send_message(message.from_user.id, message2, parse_mode=ParseMode.HTML)
+
+        message3 = """Если вы подучите эти навыки: %s, то уже сможете метить и на такую вакансию:
+%s""" % (', '.join(keys), vacancy2)
+        await bot.send_message(message.from_user.id, message3, parse_mode=ParseMode.HTML)
+        
     elif message.text == 'Создать новый профиль':
 
         #Начинаем создавать профиль

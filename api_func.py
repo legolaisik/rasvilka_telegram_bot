@@ -202,6 +202,8 @@ async def get_recomendations(user_id, conn: sqlite3.Connection):
 
             if i in keys:
                 keys.remove(i)
+
+        vacancy1 = await get_vacancies(user_id, conn, by_keys = profile[4])
         
         prompt = """Предложи должность, которую я мог бы занять сейчас с учетом этих навыков: %s. А также предложи несколько путей развития карьеры: какие должности можно занять через пару лет и что для этого нужно""" % profile[4]
 
@@ -215,11 +217,13 @@ async def get_recomendations(user_id, conn: sqlite3.Connection):
                 ],
                 "stream": False
                 }
+        
+        vacancy2 = await get_vacancies(user_id, conn)
 
         r = requests.post(THEBURL, data = json.dumps(thebparams), headers = theb_headers)
         answer = r.json()['choices'][0]['message']['content']
 
-        return keys, answer
+        return keys, vacancy1, answer, vacancy2
         
     else:
 
@@ -290,7 +294,7 @@ async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
         
         except:
 
-            answer = '''Извините\( Такие вакансии мы не нашли\.\.\.'''
+            answer = '''Извините\( Конкретную вакансию мы не нашли\.\.\.'''
             
             return answer
     
