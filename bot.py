@@ -140,8 +140,13 @@ async def enter_skills_handler(message: types.Message, state: FSMContext):
            
             else:
 
-                await bot.send_message(message.from_user.id, "Отлично\! Выберите уровень Вашего образования", reply_markup = get_education_keyboard())
-                await register.enter_education.set()
+                if data['enter_skills'] == '':
+                    await bot.send_message(message.from_user.id, "Вы еще не ввели ни одного навыка\:\( Уверены, что в Вас что\-то есть\)", reply_markup = get_skills_keyboard(skills))
+
+                else:   
+                    
+                    await bot.send_message(message.from_user.id, "Отлично\! Выберите уровень Вашего образования", reply_markup = get_education_keyboard())
+                    await register.enter_education.set()
 
     else:
 
