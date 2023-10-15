@@ -86,23 +86,35 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
 
     if message.text == 'Дальше':
 
+        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика")
+        await bot.send_message(message.from_user.id, 'Сейчас я Вам их подскажу\:\)')
+        await bot.send_chat_action(message.from_user.id, 'typing')
+
         async with state.proxy() as data:
             data['enter_salary'] = ''
+            skills = await get_skills(data['enter_profile_name'])
+            data['wanted_skills'] = skills
 
-        
-        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика")
-        await bot.send_chat_action(message.from_user.id, 'typing')s
-        await bot.send_message(message.from_user.id, 'Сейчас я Вам их подскажу\:\)')
+        await bot.send_message(message.from_user.id, 'Выбирайте или вводите сами\. Потом нажмите дальше', reply_markup=get_skills_keyboard(skills))
+
         await register.enter_skills.set()
 
     else:
 
         try:
             salary = int(message.text)
+
+            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика")
+            await bot.send_message(message.from_user.id, 'Сейчас я Вам их подскажу\:\)')
+            await bot.send_chat_action(message.from_user.id, 'typing')
+            
             async with state.proxy() as data:
                 data['enter_salary'] = str(salary)
+                skills = await get_skills(data['enter_profile_name'])
+                data['wanted_skills'] = skills
 
-            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
+            await bot.send_message(message.from_user.id, 'Выбирайте или вводите сами\. Потом нажмите дальше', reply_markup=get_skills_keyboard(skills))
+            
             await register.enter_skills.set()
 
         except:
@@ -112,13 +124,18 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(state=register.enter_skills)
 async def enter_skills_handler(message: types.Message, state: FSMContext):
 
+    async with state.proxy() as data:
+        skills = data['wanted_skills']
+        if 'enter_skills' in data:
+            skills = list( set(skills) - set(data['enter_skills'].split(', ')) )
+
     if message.text == 'Дальше':
 
         async with state.proxy() as data:
 
             if 'enter_skills' not in data:
 
-                await bot.send_message(message.from_user.id, "Вы еще не ввели ни одного навыка\:\( Уверены, что в Вас что\-то есть\)", reply_markup = get_next_keyboard())
+                await bot.send_message(message.from_user.id, "Вы еще не ввели ни одного навыка\:\( Уверены, что в Вас что\-то есть\)", reply_markup = get_skills_keyboard(skills))
            
             else:
 
@@ -133,8 +150,9 @@ async def enter_skills_handler(message: types.Message, state: FSMContext):
                 data['enter_skills'] = message.text
             else:
                 data['enter_skills'] += ', %s' % message.text
+                skills = list( set(skills) - set(data['enter_skills'].split(', ')) )
 
-        await bot.send_message(message.from_user.id, "Записали %s, Еще?" % message.text, reply_markup = get_next_keyboard(), parse_mode=ParseMode.HTML)
+        await bot.send_message(message.from_user.id, "Записали %s, Еще?" % message.text, reply_markup = get_skills_keyboard(skills), parse_mode=ParseMode.HTML)
 
 
 @dp.message_handler(state=register.enter_education)

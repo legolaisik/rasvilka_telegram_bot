@@ -116,6 +116,31 @@ expirience_list = [
 ]
 
 
+async def get_skills(role):
+    
+    params = {
+        'text': role
+            }
+
+    key_list = {}
+    r = requests.get(BASE_URL, headers=headers, params=params)
+
+    for item in r.json()['items'][:10]:
+
+        key_r = requests.get('%s/%s' % (BASE_URL, item['id'],), headers=headers)
+        for skill in key_r.json()['key_skills']:
+            if skill['name'].lower() in key_list.keys():
+                key_list[skill['name'].lower()] += 1
+            else:
+                key_list[skill['name'].lower()] = 1
+
+    keys = []
+    for key, value in key_list.items():
+        if value > 1:
+            keys.append(key.lower())
+
+    return keys if len(keys) > 0 else False
+
 async def get_recomendations(user_id, conn: sqlite3.Connection):
 
     profile = await db_get_profile(user_id, conn)
@@ -243,23 +268,31 @@ async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
 
         key_list = {}
         r = requests.get(BASE_URL, headers=headers, params=params)
-        item = random.choice(r.json()['items'])
 
-        role = item['name']
-        company = item['employer']['name']
         try:
-            salary = str(item['salary']['to'])
-        except:
-            salary = '?'
-        descr = item['snippet']['responsibility']
-        link = item['alternate_url']
+            item = random.choice(r.json()['items'])
 
-        answer = '''Должность %s от компании %s
+            role = item['name']
+            company = item['employer']['name']
+            try:
+                salary = str(item['salary']['to'])
+            except:
+                salary = '?'
+            descr = item['snippet']['responsibility']
+            link = item['alternate_url']
+
+            answer = '''Должность %s от компании %s
 Зарплата до %s
 Описание: %s 
 Посмотреть подробнее: %s''' % (role, company, salary, descr, link)
+            
+            return re.sub('<.*?>', '', answer)
         
-        return re.sub('<.*?>', '', answer)
+        except:
+
+            answer = '''Извините\( Такие вакансии мы не нашли\.\.\.'''
+            
+            return answer
     
     else:
 

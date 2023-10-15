@@ -9,6 +9,13 @@ def get_main_keyboard():
     main_keyboard.add(KeyboardButton('Получить рекомендации по текущему профилю'))
     return main_keyboard
 
+def get_skills_keyboard(skills: list):
+    skills_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    for skill in skills:
+        skills_keyboard.add(KeyboardButton(skill))
+    skills_keyboard.add(KeyboardButton('Дальше'))
+    return skills_keyboard
+
 def get_next_keyboard():
     next_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
     next_keyboard.add(KeyboardButton('Дальше'))
