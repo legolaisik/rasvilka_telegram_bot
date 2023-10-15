@@ -22,11 +22,13 @@ async def db_create_user(user_id, conn: sqlite3.Connection):
         return False
     
 # Информация по текущему профилю
-async def db_create_user(user_id, conn: sqlite3.Connection):
+async def db_get_cur_profile_info(user_id, conn: sqlite3.Connection):
     try:
-        conn.cursor().execute("INSERT INTO users (telegram_id) VALUES (?)", (str(user_id), ))
-        conn.commit()
-        return True
+        info = conn.cursor().execute("SELECT profile_name, salary, skills, education, expirience, jobtime, jobtype FROM profiles WHERE (profile_id) = (SELECT active_profile FROM users WHERE telegram_id = ?)", (str(user_id), )).fetchall()
+        if info != None:
+            return list(info[0])
+        else:
+            return ["" for i in range(10)]
     except Exception as e:
         print(e)
         return False
