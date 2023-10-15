@@ -227,7 +227,7 @@ async def get_recomendations(user_id, conn: sqlite3.Connection):
         
     else:
 
-        return False
+        return False, False, False, False
     
 async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
 
@@ -251,24 +251,34 @@ async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
                 education_level = i['id']
 
         if not by_keys:
+
             params = {
                 'text': profile[2]
                     }
+            if profile[9] != '':
+                params['area'] = profile[9]
+            if profile[6] != '':
+                params['experience'] = expirience
+            if profile[7] != '':
+                params['employment'] = employment
+            if profile[8] != '':
+                params['schedule'] = schedule
+            if profile[3] != '':
+                params['salary'] = profile[3]
+
         else:
+
             params = {
                 'text': by_keys
             }
-
-        if profile[9] != '':
-            params['area'] = profile[9]
-        if profile[6] != '':
-            params['experience'] = expirience
-        if profile[7] != '':
-            params['employment'] = employment
-        if profile[8] != '':
-            params['schedule'] = schedule
-        if profile[3] != '':
-            params['salary'] = profile[3]
+            if profile[9] != '':
+                params['area'] = profile[9]
+            if profile[6] != '':
+                params['experience'] = expirience
+            if profile[7] != '':
+                params['employment'] = employment
+            if profile[8] != '':
+                params['schedule'] = schedule
 
         key_list = {}
         r = requests.get(BASE_URL, headers=headers, params=params)
@@ -294,7 +304,7 @@ async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
         
         except:
 
-            answer = '''Извините\( Конкретную вакансию мы не нашли\.\.\.'''
+            answer = '''Извините( Конкретную вакансию мы не нашли...'''
             
             return answer
     
