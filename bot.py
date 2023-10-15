@@ -256,22 +256,30 @@ async def lobby_handler(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
 
-        await bot.send_message(message.from_user.id, 'Я уже начал собирать информацию\.\.\.', parse_mode=ParseMode.HTML)
+        await bot.send_message(message.from_user.id, 'Я уже начал собирать информацию...', parse_mode=ParseMode.HTML)
         await bot.send_chat_action(message.from_user.id, 'typing')
         
         keys,vacancy1, answer, vacancy2 = await get_recomendations(message.from_user.id, conn)
         
-        message1 = """Основываясь на Ваших навыках, сейчас Вы можете посмотреть такую вакансию:
+        if False not in [keys,vacancy1, answer, vacancy2]:
+
+            await bot.send_message(message.from_user.id, 'Мы подготовили Вам развилку:)', parse_mode=ParseMode.HTML)
+
+            message1 = """Основываясь на Ваших навыках, сейчас Вы можете посмотреть такую вакансию:
 %s""" % vacancy1
-        await bot.send_message(message.from_user.id, message1, parse_mode=ParseMode.HTML)
+            await bot.send_message(message.from_user.id, message1, parse_mode=ParseMode.HTML)
 
-        message2 = """Вот наши советы как достичь работы мечты:
+            message2 = """Вот наши советы как достичь работы мечты:
 %s""" % answer
-        await bot.send_message(message.from_user.id, message2, parse_mode=ParseMode.HTML)
+            await bot.send_message(message.from_user.id, message2, parse_mode=ParseMode.HTML)
 
-        message3 = """Если вы подучите эти навыки: %s, то уже сможете метить и на такую вакансию:
+            message3 = """Если вы подучите эти навыки: %s, то уже сможете метить и на такую вакансию:
 %s""" % (', '.join(keys), vacancy2)
-        await bot.send_message(message.from_user.id, message3, parse_mode=ParseMode.HTML)
+            await bot.send_message(message.from_user.id, message3, parse_mode=ParseMode.HTML)
+
+        else:
+
+            await bot.send_message(message.from_user.id, 'У нас произошла ошибка:(', parse_mode=ParseMode.HTML)
         
     elif message.text == 'Создать новый профиль':
 
