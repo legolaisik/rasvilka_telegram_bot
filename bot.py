@@ -58,7 +58,7 @@ async def start_handler(message: types.Message, state: FSMContext):
 
         await db_create_user(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, """Привет\!
-Это бот Развилка, который поможет тебе освоить траекторию твоей карьеры\:\)
+Это бот Развилка, который поможет тебе понять и освоить траекторию твоей карьеры\:\)
 Вводи данные ниже и освой навыки, которые понадобятся для работы мечты\!""")
 
         #Начинаем создавать профиль
@@ -77,7 +77,7 @@ async def enter_profile_name_handler(message: types.Message, state: FSMContext):
         data['enter_profile_name'] = message.text
 
     await bot.send_message(message.from_user.id, "Отлично\! Должность %s введена" % message.text)
-    await bot.send_message(message.from_user.id, "Введите желаемую зарплату\. Если она не важна, нажмите дальше", reply_markup = get_next_keyboard())
+    await bot.send_message(message.from_user.id, "Введите желаемую зарплату \(например, 50000\)\. Если она не важна, нажмите дальше", reply_markup = get_next_keyboard())
 
     await register.enter_salary.set()
 
@@ -89,7 +89,7 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['enter_salary'] = ''
 
-        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
+        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
         await register.enter_skills.set()
 
     else:
@@ -99,7 +99,7 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
             async with state.proxy() as data:
                 data['enter_salary'] = str(salary)
 
-            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
+            await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
             await register.enter_skills.set()
 
         except:
@@ -119,7 +119,7 @@ async def enter_skills_handler(message: types.Message, state: FSMContext):
            
             else:
 
-                await bot.send_message(message.from_user.id, "Отлично\! Выберите Ваше образование", reply_markup = get_education_keyboard())
+                await bot.send_message(message.from_user.id, "Отлично\! Выберите уровень Вашего образования", reply_markup = get_education_keyboard())
                 await register.enter_education.set()
 
     else:
@@ -160,7 +160,7 @@ async def enter_experience_handler(message: types.Message, state: FSMContext):
 
             data['enter_experience'] = message.text
         
-        await bot.send_message(message.from_user.id, "Отлично\! Какой график хотите?", reply_markup = get_schedule_keyboard())
+        await bot.send_message(message.from_user.id, "Отлично\! По какому графику хотите работать?", reply_markup = get_schedule_keyboard())
         await register.enter_jobtime.set()
 
     else:
@@ -177,7 +177,7 @@ async def enter_jobtime_handler(message: types.Message, state: FSMContext):
 
             data['enter_jobtime'] = message.text
         
-        await bot.send_message(message.from_user.id, "Отлично\! Как хотите работать?", reply_markup = get_employment_keyboard())
+        await bot.send_message(message.from_user.id, "Отлично\! С каким типом занятости Вы хотите работать\?", reply_markup = get_employment_keyboard())
         await register.enter_jobtype.set()
 
     else:
@@ -228,11 +228,11 @@ async def lobby_handler(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
         keys = await get_recomendations(message.from_user.id, conn)
-        await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML)
+        await bot.send_message(message.from_user.id, 'Вот эти навыки могут быть для вас полезны: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML)
     elif message.text == 'Создать новый профиль':
 
         #Начинаем создавать профиль
-        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например: Технический директор")
+        await bot.send_message(message.from_user.id, "Введите работу мечты\. Например\: Технический директор")
         await register.enter_profile_name.set()
     elif message.text == 'Сменить профиль':
         profiles = await db_get_profiles(message.from_user.id, conn)
