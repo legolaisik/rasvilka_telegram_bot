@@ -21,10 +21,20 @@ async def db_create_user(user_id, conn: sqlite3.Connection):
         print(e)
         return False
     
+# Информация по текущему профилю
+async def db_create_user(user_id, conn: sqlite3.Connection):
+    try:
+        conn.cursor().execute("INSERT INTO users (telegram_id) VALUES (?)", (str(user_id), ))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+    
 async def db_set_primary_profile(user_id, conn: sqlite3.Connection, name):
     try:
         conn.cursor().execute('''UPDATE users set active_profile = 
-                              (select profile_id from profiles where telegram_id = ? and profile_name = ? limit 1)''', (str(user_id), name,))
+                              (select profile_id from profiles where telegram_id = ? and profile_name = ? limit 1) where telegram_id = ?''', (str(user_id), name, str(user_id)))
         conn.commit()
         return True
     except:
@@ -46,7 +56,7 @@ async def db_create_profile(user_id, conn: sqlite3.Connection, data):
         conn.cursor().execute("""INSERT INTO profiles (telegram_id, profile_name, salary, skills, education, expirience, jobtime, jobtype, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", 
                               (str(user_id), data['enter_profile_name'], data['enter_salary'], data['enter_skills'], data['enter_education'], data['enter_experience'], data['enter_jobtime'], data['enter_jobtype'], '2'))
         conn.cursor().execute('''UPDATE users set active_profile = 
-                              (select profile_id from profiles where telegram_id = ? and profile_name = ? limit 1)''', (str(user_id), data['enter_profile_name'],))
+                              (select profile_id from profiles where telegram_id = ? and profile_name = ? limit 1) where telegram_id = ?''', (str(user_id), data['enter_profile_name'],str(user_id)))
         conn.commit()
     except Exception as e:
         print(e)
