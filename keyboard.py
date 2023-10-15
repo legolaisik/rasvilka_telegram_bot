@@ -2,6 +2,7 @@ from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButt
 
 def get_main_keyboard():
     main_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+    main_keyboard.add(KeyboardButton('Текущий профиль'))
     main_keyboard.add(KeyboardButton('Создать новый профиль'))
     main_keyboard.add(KeyboardButton('Удалить текущий профиль'))
     main_keyboard.add(KeyboardButton('Сменить профиль'))
