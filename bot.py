@@ -247,7 +247,6 @@ async def choose_from_profile_handler(message: types.Message, state: FSMContext)
 async def lobby_handler(message: types.Message, state: FSMContext):
     if message.text == 'Текущий профиль':
         profile_info = await db_get_cur_profile_info(message.from_user.id, conn)
-        print(profile_info)
         answer = "Должность: %s"%str(profile_info[0]) + "\n" + "Зарплата: %s"%str(profile_info[1]) + "\n" + "Навыки: %s"%str(profile_info[2]) \
             + "\n" + "Образование: %s"%str(profile_info[3]) + "\n" + "Опыт: %s"%str(profile_info[4]) + "\n" + "Занятость: %s"%str(profile_info[5]) \
                 + "\n" + "Тип работы: %s"%str(profile_info[6])
