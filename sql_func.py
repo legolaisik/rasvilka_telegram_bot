@@ -46,7 +46,7 @@ async def db_delete_current_profile(user_id, conn: sqlite3.Connection):
     try:
         conn.cursor().execute('''delete from profiles where profile_id = (select active_profile from users where telegram_id = ?) ''', (str(user_id),))
         conn.cursor().execute('''UPDATE users set active_profile = 
-                              (select profile_id from profiles where telegram_id = ? limit 1)''', (str(user_id),))
+                              (select profile_id from profiles where telegram_id = ? limit 1) where telegram_id = ?''', (str(user_id), str(user_id),))
         conn.commit()
         return True
     except:
