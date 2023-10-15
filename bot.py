@@ -149,9 +149,14 @@ async def enter_skills_handler(message: types.Message, state: FSMContext):
 
             if 'enter_skills' not in data:
                 data['enter_skills'] = message.text
+
             else:
-                data['enter_skills'] += ', %s' % message.text
-                skills = list( set(skills) - set(data['enter_skills'].split(', ')) )
+                if data['enter_skills'] == '':
+                    data['enter_skills'] = message.text
+
+                else:
+                    data['enter_skills'] += ', %s' % message.text
+                    skills = list( set(skills) - set(data['enter_skills'].split(', ')) )
 
         await bot.send_message(message.from_user.id, "Записали %s, Еще?" % message.text, reply_markup = get_skills_keyboard(skills), parse_mode=ParseMode.HTML)
 
@@ -216,6 +221,8 @@ async def enter_jobtype_handler(message: types.Message, state: FSMContext):
 
             data['enter_jobtype'] = message.text
             await db_create_profile(message.from_user.id, conn, data)
+
+            data['enter_skills'] = ''
 
         await bot.send_message(message.from_user.id, "Отлично\! Профиль зарегистрирован", reply_markup = get_main_keyboard())
         await lobby.profiles_list.set()
