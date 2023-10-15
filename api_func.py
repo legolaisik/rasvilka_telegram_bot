@@ -12,6 +12,8 @@ from config import *
 
 BASE_URL = "https://api.hh.ru/vacancies"
 headers = {'HH-User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0"}
+THEBURL = 'https://api.theb.ai/v1/chat/completions'
+theb_headers = {'Authorization': theb_token, 'Content-Type': 'application/json'}
 
 employment_list = [
     {
@@ -175,14 +177,30 @@ async def get_recomendations(user_id, conn: sqlite3.Connection):
 
             if i in keys:
                 keys.remove(i)
+        
+        prompt = """Предложи должность, которую я мог бы занять сейчас с учетом этих навыков: %s. А также предложи несколько путей развития карьеры: какие должности можно занять через пару лет и что для этого нужно""" % profile[4]
 
-        return keys
-    
+        thebparams = {
+                "model": "gpt-3.5-turbo",
+                "messages": [
+                    {
+                    "role": "user",
+                    "content": prompt
+                    }
+                ],
+                "stream": False
+                }
+
+        r = requests.post(THEBURL, data = json.dumps(thebparams), headers = theb_headers)
+        answer = r.json()['choices'][0]['message']['content']
+
+        return keys, answer
+        
     else:
 
         return False
     
-async def get_vacancies(user_id, conn: sqlite3.Connection):
+async def get_vacancies(user_id, conn: sqlite3.Connection, by_keys = False):
 
     profile = await db_get_profile(user_id, conn)
     if profile:
@@ -203,9 +221,15 @@ async def get_vacancies(user_id, conn: sqlite3.Connection):
             if i['name'] == profile[5]:
                 education_level = i['id']
 
-        params = {
-            'text': profile[2]
-                }
+        if not by_keys:
+            params = {
+                'text': profile[2]
+                    }
+        else:
+            params = {
+                'text': by_keys
+            }
+
         if profile[9] != '':
             params['area'] = profile[9]
         if profile[6] != '':

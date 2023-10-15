@@ -218,7 +218,7 @@ async def choose_from_profile_handler(message: types.Message, state: FSMContext)
         profiles_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         for profile in profiles:
             profiles_keyboard.add(KeyboardButton(profile))
-        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = profiles_keyboard())
+        await bot.send_message(message.from_user.id, "Мы такого не знаем\(", reply_markup = profiles_keyboard)
         
 
 @dp.message_handler(state=lobby.profiles_list)
@@ -227,8 +227,9 @@ async def lobby_handler(message: types.Message, state: FSMContext):
         answer = await get_vacancies(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Получить рекомендации по текущему профилю':
-        keys = await get_recomendations(message.from_user.id, conn)
+        keys, answer = await get_recomendations(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, 'Вам бы подтянуть эти навыки: %s' % (', '.join(keys)), parse_mode=ParseMode.HTML)
+        await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Создать новый профиль':
 
         #Начинаем создавать профиль
