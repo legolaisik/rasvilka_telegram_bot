@@ -139,7 +139,7 @@ async def get_skills(role):
         if value > 1:
             keys.append(key.lower())
 
-    return keys if len(keys) > 0 else False
+    return keys if len(keys) > 0 else []
 
 async def get_recomendations(user_id, conn: sqlite3.Connection):
 

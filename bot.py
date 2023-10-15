@@ -119,7 +119,7 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
             await register.enter_skills.set()
 
         except:
-            await bot.send_message(message.from_user.id, "Введите число или нажмите Дальше", reply_markup = get_next_keyboard())
+            await bot.send_message(message.from_user.id, "Ошибочка\.\.\.", reply_markup = get_next_keyboard())
 
 
 @dp.message_handler(state=register.enter_skills)
