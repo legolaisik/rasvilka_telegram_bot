@@ -246,7 +246,12 @@ async def choose_from_profile_handler(message: types.Message, state: FSMContext)
 @dp.message_handler(state=lobby.profiles_list)
 async def lobby_handler(message: types.Message, state: FSMContext):
     if message.text == 'Текущий профиль':
-        await bot.send_message(message.from_user.id, "Информация по текущему профилю", parse_mode=ParseMode.HTML)
+        profile_info = await db_get_cur_profile_info(message.from_user.id, conn)
+        print(profile_info)
+        answer = "Должность: %s"%str(profile_info[0]) + "\n" + "Зарплата: %s"%str(profile_info[1]) + "\n" + "Навыки: %s"%str(profile_info[2]) \
+            + "\n" + "Образование: %s"%str(profile_info[3]) + "\n" + "Опыт: %s"%str(profile_info[4]) + "\n" + "Занятость: %s"%str(profile_info[5]) \
+                + "\n" + "Тип работы: %s"%str(profile_info[6])
+        await bot.send_message(message.from_user.id, "Информация по текущему профилю\n" + answer, parse_mode=ParseMode.HTML)
     elif message.text == 'Посмотреть вакансии по текущему профилю':
         answer = await get_vacancies(message.from_user.id, conn)
         await bot.send_message(message.from_user.id, answer, parse_mode=ParseMode.HTML)
