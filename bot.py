@@ -89,7 +89,10 @@ async def enter_salary_handler(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['enter_salary'] = ''
 
-        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика", reply_markup = get_next_keyboard())
+        
+        await bot.send_message(message.from_user.id, "Отлично\! Теперь вводите ваши ключевые навыки по одному \(ввести один \-\> отправить\)\. Когда введены все, нажмите кнопку Дальше\. Например: Python, sql, Аналитика")
+        await bot.send_chat_action(message.from_user.id, 'typing')s
+        await bot.send_message(message.from_user.id, 'Сейчас я Вам их подскажу\:\)')
         await register.enter_skills.set()
 
     else:
